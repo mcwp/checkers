@@ -18,8 +18,64 @@
 [
 <div class="piece red" style="top: 0px;​ left: 144px;"></div>
 ]
-  
+
+    startConnection : function (url, newTopic, onStartCallback, messageProps, gotMessagePlay) {
 */
+
+var MESSAGE_PROPERTIES = {
+    "pieceId" : "PIECEID",
+    "newTop" : "NEWTOP",
+    "newLeft" : "NEWLEFT"
+}
+
+var readyToPlay = false;
+
+function setUpMessaging() {
+    // construct the WebSocket location
+    var locationURI = new URI(document.URL || location.href);
+    var destination = "/topic/checkers"
+
+    locationURI.scheme = locationURI.scheme.replace("http", "ws");
+    locationURI.path = "/jms";
+    delete locationURI.query;
+    delete locationURI.fragment;
+    // default the location
+    url = locationURI.toString();
+    ccps.startConnection(url, destination, init, MESSAGE_PROPERTIES, makeMove);
+}
+
+function init() {
+}
+
+function makeMove(messageData) {
+    console.log("rtp in make move is " + readyToPlay);
+    console.log(messageData);
+    if (readyToPlay) {
+	pieceToMove = document.getElementById(messageData.pieceId);
+	$pieceToMove =$(pieceToMove);
+	$pieceToMove.css('top', messageData.newTop);
+	$pieceToMove.css('left', messageData.newLeft);
+    }
+}
+    
+function movePieceTo($piece,newTop,newLeft) {
+    //set the css 'top' and 'left'
+    //attributes of the passed piece
+    //to the arguments newTop and newLeft
+    $piece.css('top', newTop);
+    $piece.css('left', newLeft);
+    console.log("rtp in movePieceTo is " + readyToPlay);
+    if (readyToPlay) {
+	var newMessageData = {};
+	newMessageData.pieceId = $piece[0].id;
+	newMessageData.newTop = newTop;
+	newMessageData.newLeft = newLeft;
+	console.log("sending ...");
+//	console.log($piece);
+	console.log(newMessageData);
+	ccps.sendMessagePlay(newMessageData);
+    }
+}
 
 function setUpPieces() {
     //select all the divs with class 'piece'
@@ -29,13 +85,6 @@ function setUpPieces() {
     $('div.piece:odd').addClass('blue');
 }
 
-function movePieceTo($piece,newTop,newLeft) {
-    //set the css 'top' and 'left'
-    //attributes of the passed piece
-    //to the arguments newTop and newLeft
-    $piece.css('top', newTop);
-    $piece.css('left', newLeft);
-}
 
 function setUpBoard() {
     //iterate through all of the divs 
@@ -163,16 +212,17 @@ $('document').ready(function() {
     //set up the board with the correct classes
     //for the light and dark squares
     setUpBoard();
+    setUpMessaging();
     
     
     //creating the 24 pieces and adding them to the DOM
     var pieceCount = 24;
+    var newp;
     for (i=0;i<pieceCount;i++) {
-        
+        newp = "<div id=piece" + i + "/>";
         //this line appends an empty div
         //with the class 'piece' to the div with id 'pieces'
-        $('div#pieces').append($('<div/>').addClass('piece'));
-    
+        $('div#pieces').append($(newp).addClass('piece'));
     }
     
     //YOUR CODE
@@ -215,6 +265,7 @@ $('document').ready(function() {
     //the class 'open' represents a square
     //that is unoccupied
     getOpenSquares().addClass('open');
+    readyToPlay = true;
     
     //and now the events
     $('div.piece').click(function() {
