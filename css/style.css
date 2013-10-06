@@ -113,3 +113,48 @@ div.piece.blue {
 #meta {
     float:right;
 }
+
+div.startbar {
+    position:absolute;
+    top: 400px;
+    margin-top: 10px;
+    max-width: 400px;
+}
+
+#newgame, #startednew {
+    background-color:#00C;
+    color: #fad087;
+    font-family: papyrus;
+    border-radius: 5px;
+    float:left;  
+    position:relative;
+}
+#join, #joined {
+    background-color:#C00;
+    color: #fad087;
+    font-family: papyrus;
+    border-radius: 5px;
+    float:left;  
+    position:relative;
+}
+
+#joined, div.started {
+    width: 100%;
+}
+
+div.start {
+    width:50%;
+    display: inline-block;
+    text-indent: 10px;
+    padding-top: 10px;
+}
+
+div.started{
+    display: none;
+    text-indent: 10px;
+    padding-top: 10px;
+}
+
+input {
+    margin-left: 10px;
+}

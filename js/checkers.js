@@ -22,6 +22,16 @@
     startConnection : function (url, newTopic, onStartCallback, messageProps, gotMessagePlay) {
 */
 
+/*
+**********************************
+clean up that messy stuff up above, maybe move it to 
+codebits
+
+Then isolate the checkers game from the hooks added
+to make use of ws.js. 
+
+*/
+
 var MESSAGE_PROPERTIES = {
     "pieceId" : "PIECEID",
     "newTop" : "NEWTOP",
@@ -197,6 +207,15 @@ function getOpenSquares() {
     return $out;
 }
 
+var channel = (Math.round (Math.random()*100000)).toString();
+
+function switcheroo(id, msg) {
+    $('div.start').fadeOut(200, function () {
+        $(id).fadeIn('fast');        
+    });
+    $(id).text(msg);    
+}
+
 $('document').ready(function() {
 
     //Creating the 64 squares and adding them to the DOM
@@ -266,8 +285,31 @@ $('document').ready(function() {
     //that is unoccupied
     getOpenSquares().addClass('open');
     readyToPlay = true;
+
+    // make start/join the same height
+    $('#newgame').height($('#join').height())
+    // set focus for joining a game
+    $('input[name=ourChannel]').focus()
+
+    // events for the startbar
+    $('#newgame').click(function () {
+        var msg = "Started new game, channel = " + channel;
+        switcheroo('#startednew', msg);
+    });
+    $('#join').click(function () {
+        var ocIn = $('input[name=ourChannel]');
+        if (ocIn.val() == "") {
+            ocIn[0].previousSibling.textContent = 'Enter game channel id string to join or start a new game.';
+            ocIn.focus()
+        } else {
+            switcheroo('#joined', 'Joined game on channel ' + ocIn.val())
+        }
+    });
+    $('#join').submit(function (event) {
+        event.preventDefault();
+    });
     
-    //and now the events
+    //and now the game events
     $('div.piece').click(function() {
         
         //turn `this` into a jQuery object
