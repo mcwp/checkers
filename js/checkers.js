@@ -39,11 +39,12 @@ var MESSAGE_PROPERTIES = {
 }
 
 var readyToPlay = false;
+var channel = (Math.round (Math.random()*100000)).toString();
+var destination = "/topic/checkers"
 
 function setUpMessaging() {
     // construct the WebSocket location
     var locationURI = new URI(document.URL || location.href);
-    var destination = "/topic/checkers"
 
     locationURI.scheme = locationURI.scheme.replace("http", "ws");
     locationURI.path = "/jms";
@@ -51,6 +52,7 @@ function setUpMessaging() {
     delete locationURI.fragment;
     // default the location
     url = locationURI.toString();
+    destination = destination + channel;
     ccps.startConnection(url, destination, init, MESSAGE_PROPERTIES, makeMove);
 }
 
@@ -58,13 +60,13 @@ function init() {
 }
 
 function makeMove(messageData) {
-    console.log("rtp in make move is " + readyToPlay);
-    console.log(messageData);
+    // console.log("rtp in make move is " + readyToPlay);
+    // console.log(messageData);
     if (readyToPlay) {
-	pieceToMove = document.getElementById(messageData.pieceId);
-	$pieceToMove =$(pieceToMove);
-	$pieceToMove.css('top', messageData.newTop);
-	$pieceToMove.css('left', messageData.newLeft);
+    	pieceToMove = document.getElementById(messageData.pieceId);
+    	$pieceToMove =$(pieceToMove);
+    	$pieceToMove.css('top', messageData.newTop);
+    	$pieceToMove.css('left', messageData.newLeft);
     }
 }
     
@@ -76,14 +78,14 @@ function movePieceTo($piece,newTop,newLeft) {
     $piece.css('left', newLeft);
     console.log("rtp in movePieceTo is " + readyToPlay);
     if (readyToPlay) {
-	var newMessageData = {};
-	newMessageData.pieceId = $piece[0].id;
-	newMessageData.newTop = newTop;
-	newMessageData.newLeft = newLeft;
-	console.log("sending ...");
-//	console.log($piece);
-	console.log(newMessageData);
-	ccps.sendMessagePlay(newMessageData);
+    	var newMessageData = {};
+    	newMessageData.pieceId = $piece[0].id;
+    	newMessageData.newTop = newTop;
+    	newMessageData.newLeft = newLeft;
+    	console.log("sending ...");
+    //	console.log($piece);
+    	console.log(newMessageData);
+    	ccps.sendMessagePlay(newMessageData);
     }
 }
 
@@ -207,13 +209,13 @@ function getOpenSquares() {
     return $out;
 }
 
-var channel = (Math.round (Math.random()*100000)).toString();
-
 function switcheroo(id, msg) {
     $('div.start').fadeOut(200, function () {
         $(id).fadeIn('fast');        
     });
     $(id).text(msg);    
+    setUpMessaging();
+    readyToPlay = true;
 }
 
 $('document').ready(function() {
@@ -231,7 +233,6 @@ $('document').ready(function() {
     //set up the board with the correct classes
     //for the light and dark squares
     setUpBoard();
-    setUpMessaging();
     
     
     //creating the 24 pieces and adding them to the DOM
@@ -284,7 +285,6 @@ $('document').ready(function() {
     //the class 'open' represents a square
     //that is unoccupied
     getOpenSquares().addClass('open');
-    readyToPlay = true;
 
     // make start/join the same height
     $('#newgame').height($('#join').height())
@@ -302,7 +302,8 @@ $('document').ready(function() {
             ocIn[0].previousSibling.textContent = 'Enter game channel id string to join or start a new game.';
             ocIn.focus()
         } else {
-            switcheroo('#joined', 'Joined game on channel ' + ocIn.val())
+            channel = ocIn.val()
+            switcheroo('#joined', 'Joined game on channel ' + channel);
         }
     });
     $('#join').submit(function (event) {
@@ -311,7 +312,9 @@ $('document').ready(function() {
     
     //and now the game events
     $('div.piece').click(function() {
-        
+        if (!readyToPlay) {
+            return;
+        }
         //turn `this` into a jQuery object
         var $this = $(this);
         
@@ -322,6 +325,9 @@ $('document').ready(function() {
     });
     
     $('div.square').click(function() {
+        if (!readyToPlay) {
+            return;
+        }
         
         //turn `this` into a jQuery object
         var $this = $(this);
