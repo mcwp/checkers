@@ -348,8 +348,14 @@ $('document').ready(function() {
                 var x = index % 8;
                 var y = Math.floor(index / 8);
                 var pixels = getPixels(x,y);
+                console.log("index " + index + " x " + x + " y " + y)
                 
-                //YOUR CODE
+                // alternative math
+                // orient: if redPlayer, return 63-index else return index
+                // layout red pieces: 
+                // foreach red, 0-11, 2i+1, then orient
+                // foreach blue, 0-11, 2i+40, then orient
+
                 //actually do the moving
                 movePieceTo($selectedPiece,pixels.top,pixels.left);
                 

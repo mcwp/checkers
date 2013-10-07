@@ -1,7 +1,10 @@
+body {
+    background-color: black;
+}
+
 #game {
     position:relative;
 }
-
 
 #board {
     
