@@ -216,6 +216,7 @@ function switcheroo(id, msg) {
     $(id).text(msg);    
     setUpMessaging();
     readyToPlay = true;
+    $('#game').fadeTo('fast', 1);
 }
 
 $('document').ready(function() {
@@ -285,6 +286,7 @@ $('document').ready(function() {
     //the class 'open' represents a square
     //that is unoccupied
     getOpenSquares().addClass('open');
+    $('#game').fadeTo('fast', .25);
 
     // make start/join the same height
     $('#newgame').height($('#join').height())
