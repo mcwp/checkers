@@ -36,11 +36,12 @@ var MESSAGE_PROPERTIES = {
     "pieceId" : "PIECEID",
     "newTop" : "NEWTOP",
     "newLeft" : "NEWLEFT"
-}
+};
 
 var readyToPlay = false;
+var redplayer = false;
 var channel = (Math.round (Math.random()*100000)).toString();
-var destination = "/topic/checkers"
+var destination = "/topic/checkers";
 
 function setUpMessaging() {
     // construct the WebSocket location
@@ -63,10 +64,11 @@ function makeMove(messageData) {
     // console.log("rtp in make move is " + readyToPlay);
     // console.log(messageData);
     if (readyToPlay) {
-    	pieceToMove = document.getElementById(messageData.pieceId);
-    	$pieceToMove =$(pieceToMove);
-    	$pieceToMove.css('top', messageData.newTop);
-    	$pieceToMove.css('left', messageData.newLeft);
+        pieceToMove = document.getElementById(messageData.pieceId);
+        $pieceToMove =$(pieceToMove);
+        console.log('pieceToMove ' + $pieceToMove);
+        $pieceToMove.css('top', messageData.newTop);
+        $pieceToMove.css('left', messageData.newLeft);
     }
 }
     
@@ -74,18 +76,19 @@ function movePieceTo($piece,newTop,newLeft) {
     //set the css 'top' and 'left'
     //attributes of the passed piece
     //to the arguments newTop and newLeft
+    console.log('move piece ' + $piece);
     $piece.css('top', newTop);
     $piece.css('left', newLeft);
     console.log("rtp in movePieceTo is " + readyToPlay);
     if (readyToPlay) {
-    	var newMessageData = {};
-    	newMessageData.pieceId = $piece[0].id;
-    	newMessageData.newTop = newTop;
-    	newMessageData.newLeft = newLeft;
-    	console.log("sending ...");
+        var newMessageData = {};
+        newMessageData.pieceId = $piece[0].id;
+        newMessageData.newTop = newTop;
+        newMessageData.newLeft = newLeft;
+        console.log("sending ...");
     //	console.log($piece);
-    	console.log(newMessageData);
-    	ccps.sendMessagePlay(newMessageData);
+        console.log(newMessageData);
+        ccps.sendMessagePlay(newMessageData);
     }
 }
 
@@ -169,7 +172,7 @@ function getPixels(x,y) {
     return {
         'top':  (y * (width+border))+'px',
         'left': (x * (width+border))+'px'
-    };    
+    };
 }
 
 //utility function for turning a pixel position
@@ -182,6 +185,20 @@ function getCoords(top,left) {
         'x': left / (width + border),
         'y': top / (width + border)
     };
+}
+
+function orient(index) {
+    // alternative math
+    // orient: if redPlayer, return 63-index else return index
+    // layout red pieces: 
+    // foreach red, 0-11, 2i+1, then orient
+    // foreach blue, 0-11, 2i+40, then orient
+
+    if (redplayer) {
+        return 63 - index;
+    } else {
+        return index;
+    }
 }
 
 //utility function for returning
@@ -211,9 +228,9 @@ function getOpenSquares() {
 
 function switcheroo(id, msg) {
     $('div.start').fadeOut(200, function () {
-        $(id).fadeIn('fast');        
+        $(id).fadeIn('fast');
     });
-    $(id).text(msg);    
+    $(id).text(msg);
     setUpMessaging();
     readyToPlay = true;
     $('#game').fadeTo('fast', 1);
@@ -252,6 +269,9 @@ $('document').ready(function() {
     
     //this loop moves all the light pieces to their initial positions
     $('div.piece.red').each(function(index,piece) {
+
+        // foreach red, 0-11, 2i+1, then orient
+        // foreach blue, 0-11, 2i+40, then orient
         
         //turning the index (from 0 - 11)
         //into a x,y square coordinate using math
@@ -286,26 +306,28 @@ $('document').ready(function() {
     //the class 'open' represents a square
     //that is unoccupied
     getOpenSquares().addClass('open');
-    $('#game').fadeTo('fast', .25);
+    $('#game').fadeTo('fast', 0.25);
 
     // make start/join the same height
-    $('#newgame').height($('#join').height())
+    $('#newgame').height($('#join').height());
     // set focus for joining a game
-    $('input[name=ourChannel]').focus()
+    $('input[name=ourChannel]').focus();
 
     // events for the startbar
     $('#newgame').click(function () {
         var msg = "Started new game, channel = " + channel;
         switcheroo('#startednew', msg);
+        redplayer = false;
     });
     $('#join').click(function () {
         var ocIn = $('input[name=ourChannel]');
-        if (ocIn.val() == "") {
+        if (ocIn.val() === "") {
             ocIn[0].previousSibling.textContent = 'Enter game channel id string to join or start a new game.';
-            ocIn.focus()
+            ocIn.focus();
         } else {
-            channel = ocIn.val()
+            channel = ocIn.val();
             switcheroo('#joined', 'Joined game on channel ' + channel);
+            redplayer = true;
         }
     });
     $('#join').submit(function (event) {
@@ -344,18 +366,12 @@ $('document').ready(function() {
             if ($selectedPiece.length == 1) {
                 //get the index of the square
                 //and translate it to pixel position
-                var index = $this.prevAll().length;
-                var x = index % 8;
-                var y = Math.floor(index / 8);
+                var squareIndex = $this.prevAll().length;
+                var x = squareIndex % 8;
+                var y = Math.floor(squareIndex / 8);
                 var pixels = getPixels(x,y);
-                console.log("index " + index + " x " + x + " y " + y)
+                console.log("index " + squareIndex + " x " + x + " y " + y);
                 
-                // alternative math
-                // orient: if redPlayer, return 63-index else return index
-                // layout red pieces: 
-                // foreach red, 0-11, 2i+1, then orient
-                // foreach blue, 0-11, 2i+40, then orient
-
                 //actually do the moving
                 movePieceTo($selectedPiece,pixels.top,pixels.left);
                 
