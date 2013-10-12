@@ -69,12 +69,12 @@ function makeMove(messageData) {
         console.log('pieceToMove ' + $pieceToMove);
         var top = messageData.newTop;
         var left = messageData.newLeft;
-        if (redplayer) {
-            var coords = getCoords(parseInt(top, 10),parseInt(left, 10));
-            var pixels = getPixels(coords.x, coords.y);
-            top = pixels.top;
-            left = pixels.left;
-        }
+        // if (redplayer) {
+        var coords = getCoords(parseInt(top, 10),parseInt(left, 10));
+        var pixels = getPixels(coords.x, coords.y, true);
+        top = pixels.top;
+        left = pixels.left;
+        // }
         $pieceToMove.css('top', top);
         $pieceToMove.css('left', left);
     }
@@ -173,14 +173,16 @@ var border = 2;
 //corner is at position 0,0
 //the square in the upper right, at 7,0 and the lower
 //right at 7,7
-function getPixels(x,y) {
+function getPixels(x,y,flip) {
     //ok... so takes an x,y position, returns
     //pixels from the left, right
-    if (redplayer) {
+    if (flip) {
         console.log("x, y are ", x, y);
         var xNew = 7-x;
         var yNew = 7-y;
-        console.log("redplayer: new x = ", xNew, " new y = ", yNew);
+        console.log("flipping: new x = ", xNew, " new y = ", yNew);
+        x = xNew;
+        y = yNew;
     }
     return {
         'top':  (y * (width+border))+'px',
@@ -220,9 +222,10 @@ function getOpenSquares() {
             var position = $(piece).position();
             var coords = getCoords(position.top,position.left);
             var squareIndex = coords.y * 8 + coords.x;
-            if (redplayer) {
-                console.log("perhaps sqi should be ", 63-squareIndex);
-            }
+            // if (redplayer) {
+                // console.log("perhaps sqi should be ", 63-squareIndex);
+                // squareIndex = 63-squareIndex;
+            // }
             return $squares[squareIndex];
         });
     
@@ -231,6 +234,9 @@ function getOpenSquares() {
 }
 
 function switcheroo(id, msg) {
+    setUpReds();
+    setUpBlues();
+
     $('div.start').fadeOut(200, function () {
         $(id).fadeIn('fast');
     });
@@ -239,6 +245,43 @@ function switcheroo(id, msg) {
     readyToPlay = true;
     $('#game').fadeTo('fast', 1);
 }
+
+function setUpReds() {
+    //this loop moves all the light pieces to their initial positions
+    $('div.piece.red').each(function(index,piece) {
+        
+        //turning the index (from 0 - 11)
+        //into a x,y square coordinate using math
+        var y = Math.floor(index / 4);
+        var x = (index % 4) * 2 + (1 - y%2);
+        
+        //turning the x,y coordingate into a pixel position
+        var pixelPosition = getPixels(x,y,redplayer);
+        
+        //YOUR CODE
+        //actually moving the piece to its initial position
+        movePieceTo($(piece),pixelPosition.top,pixelPosition.left);
+    });
+}
+
+function setUpBlues() {
+    //this loop moves all the dark pieces to their initial positions
+    $('div.piece.blue').each(function(index,piece) {
+        
+        //turning the index (from 0 - 11)
+        //into a x,y square coordinate using math
+        var y = Math.floor(index/4) + 5;
+        var x = (index % 4) * 2 + (1-y%2);
+        
+        //turning the x,y coordinate into a pixel position
+        var pixelPosition = getPixels(x,y,redplayer);
+        
+        //YOUR CODE
+        //moving the piece to its initial position
+        movePieceTo($(piece),pixelPosition.top,pixelPosition.left);
+    });
+}
+
 
 $('document').ready(function() {
 
@@ -270,38 +313,8 @@ $('document').ready(function() {
     //YOUR CODE
     //sets up the classes for the different types of piece
     setUpPieces();
-    
-    //this loop moves all the light pieces to their initial positions
-    $('div.piece.red').each(function(index,piece) {
-        
-        //turning the index (from 0 - 11)
-        //into a x,y square coordinate using math
-        var y = Math.floor(index / 4);
-        var x = (index % 4) * 2 + (1 - y%2);
-        
-        //turning the x,y coordingate into a pixel position
-        var pixelPosition = getPixels(x,y);
-        
-        //YOUR CODE
-        //actually moving the piece to its initial position
-        movePieceTo($(piece),pixelPosition.top,pixelPosition.left);
-    });
-    
-    //this loop moves all the dark pieces to their initial positions
-    $('div.piece.blue').each(function(index,piece) {
-        
-        //turning the index (from 0 - 11)
-        //into a x,y square coordinate using math
-        var y = Math.floor(index/4) + 5;
-        var x = (index % 4) * 2 + (1-y%2);
-        
-        //turning the x,y coordinate into a pixel position
-        var pixelPosition = getPixels(x,y);
-        
-        //YOUR CODE
-        //moving the piece to its initial position
-        movePieceTo($(piece),pixelPosition.top,pixelPosition.left);
-    });
+    // setUpReds();
+    // setUpBlues();
     
     //set up initial squares
     //the class 'open' represents a square
@@ -317,8 +330,8 @@ $('document').ready(function() {
     // events for the startbar
     $('#newgame').click(function () {
         var msg = "Started new game, channel = " + channel;
-        switcheroo('#startednew', msg);
         redplayer = false;
+        switcheroo('#startednew', msg);
     });
     $('#join').click(function () {
         var ocIn = $('input[name=ourChannel]');
@@ -327,8 +340,9 @@ $('document').ready(function() {
             ocIn.focus();
         } else {
             channel = ocIn.val();
-            switcheroo('#joined', 'Joined game on channel ' + channel);
             redplayer = true;
+            switcheroo('#joined', 'Joined game on channel ' + channel);
+            // try setting them up all over again?
         }
     });
     $('#join').submit(function (event) {
@@ -370,13 +384,12 @@ $('document').ready(function() {
                 var squareIndex = $this.prevAll().length;
                 var x = squareIndex % 8;
                 var y = Math.floor(squareIndex / 8);
-                var pixels = getPixels(x,y);
+                var pixels = getPixels(x,y,false);
                 console.log("index " + squareIndex + " x " + x + " y " + y);
                 
                 //actually do the moving
                 movePieceTo($selectedPiece,pixels.top,pixels.left);
                 
-                //YOUR CODE
                 //increment the move counter
                 incrementMoveCount();
                 
