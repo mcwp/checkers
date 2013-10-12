@@ -67,8 +67,16 @@ function makeMove(messageData) {
         pieceToMove = document.getElementById(messageData.pieceId);
         $pieceToMove =$(pieceToMove);
         console.log('pieceToMove ' + $pieceToMove);
-        $pieceToMove.css('top', messageData.newTop);
-        $pieceToMove.css('left', messageData.newLeft);
+        var top = messageData.newTop;
+        var left = messageData.newLeft;
+        if (redplayer) {
+            var coords = getCoords(parseInt(top, 10),parseInt(left, 10));
+            var pixels = getPixels(coords.x, coords.y);
+            top = pixels.top;
+            left = pixels.left;
+        }
+        $pieceToMove.css('top', top);
+        $pieceToMove.css('left', left);
     }
 }
     
@@ -76,10 +84,10 @@ function movePieceTo($piece,newTop,newLeft) {
     //set the css 'top' and 'left'
     //attributes of the passed piece
     //to the arguments newTop and newLeft
-    console.log('move piece ' + $piece);
+    // console.log('move piece ' + $piece);
     $piece.css('top', newTop);
     $piece.css('left', newLeft);
-    console.log("rtp in movePieceTo is " + readyToPlay);
+    // console.log("rtp in movePieceTo is " + readyToPlay);
     if (readyToPlay) {
         var newMessageData = {};
         newMessageData.pieceId = $piece[0].id;
@@ -168,7 +176,12 @@ var border = 2;
 function getPixels(x,y) {
     //ok... so takes an x,y position, returns
     //pixels from the left, right
-    
+    if (redplayer) {
+        console.log("x, y are ", x, y);
+        var xNew = 7-x;
+        var yNew = 7-y;
+        console.log("redplayer: new x = ", xNew, " new y = ", yNew);
+    }
     return {
         'top':  (y * (width+border))+'px',
         'left': (x * (width+border))+'px'
@@ -187,19 +200,7 @@ function getCoords(top,left) {
     };
 }
 
-function orient(index) {
-    // alternative math
-    // orient: if redPlayer, return 63-index else return index
-    // layout red pieces: 
-    // foreach red, 0-11, 2i+1, then orient
-    // foreach blue, 0-11, 2i+40, then orient
 
-    if (redplayer) {
-        return 63 - index;
-    } else {
-        return index;
-    }
-}
 
 //utility function for returning
 //the set of unoccupied dark squares
@@ -219,6 +220,9 @@ function getOpenSquares() {
             var position = $(piece).position();
             var coords = getCoords(position.top,position.left);
             var squareIndex = coords.y * 8 + coords.x;
+            if (redplayer) {
+                console.log("perhaps sqi should be ", 63-squareIndex);
+            }
             return $squares[squareIndex];
         });
     
@@ -269,9 +273,6 @@ $('document').ready(function() {
     
     //this loop moves all the light pieces to their initial positions
     $('div.piece.red').each(function(index,piece) {
-
-        // foreach red, 0-11, 2i+1, then orient
-        // foreach blue, 0-11, 2i+40, then orient
         
         //turning the index (from 0 - 11)
         //into a x,y square coordinate using math
