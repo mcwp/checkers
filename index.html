@@ -10,33 +10,33 @@
 <!-- Required for IE6/IE7 cross-origin support -->
 <meta name="kaazing:postMessageBridgeURL" content="PostMessageBridge.html">
 <script src="http://demo.kaazing.com/lib/client/javascript/StompJms.js" type="text/javascript" language="javascript"></script>
-<script src='../dominoes/js/ws.js'></script>
+<script src='js/ws.js'></script>
 <script src='js/checkers.js'></script>
 
 </head>
 <body>
 
-	<div id="game">
-	    <div id="board">
+	<div class="gamelook" id="game">
+	    <div class="boardlook" id="board">
 	    </div>
 	    
-	    <div id="pieces">
+	    <div class="allpieces" id="pieces">
 	    </div>
 
 	</div>
 	<div class="startbar">
-	    <div class="start" id="newgame">
+	    <div class="start blueplayer" id="newgame">
 	        Start New Game ...
 	    </div>
-	    <div class="start" id="join">
+	    <div class="start redplayer" id="join">
 	        <form id="getChannel">
 	            Join this game
 	            <input type="text" name="ourChannel"/>
 	        </form>
 	    </div>
-	    <div class="started" id="startednew">
+	    <div class="started blueplayer" id="startednew">
 	    </div>
-	    <div class="started" id="joined">
+	    <div class="started redplayer" id="joined">
 	    </div>
 	</div>
 

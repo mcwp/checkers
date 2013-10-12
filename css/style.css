@@ -2,11 +2,11 @@ body {
     background-color: black;
 }
 
-#game {
-    position:relative;
+.gamelook {
+    position: relative;
 }
 
-#board {
+.boardlook {
     
     float:left;
     
@@ -36,14 +36,6 @@ div.square {
     border-color:#444;
 }
 
-.movable:hover {
-
-    -webkit-box-shadow: inset 0 0 8px #FFD700;
-       -moz-box-shadow: inset 0 0 8px #FFD700;
-            box-shadow: inset 0 0 8px #FFD700;
-    cursor:pointer;
-}
-
 /* the bottom row */
 div.square:nth-last-child(-n + 8) {
     border-bottom-style:none;
@@ -54,17 +46,17 @@ div.square:nth-child(8n) {
     border-right-style:none;
 }
 
-div.square.light {
+.light {
     /*background-color:#630;*/
     background-color:#8A4500;
 }
 
-div.square.dark {
+.dark {
     /*background-color:#ffc;*/
     background-color:#fad087;
 }
 
-#pieces {
+.allpieces {
     position:absolute;
     /* 9 px puts us inside of the board's borders;*/
     left:9px;
@@ -91,16 +83,16 @@ div.piece {
 }
 
 div.piece:hover {
-    -webkit-box-shadow: 0 0 2px 4px green;
-       -moz-box-shadow: 0 0 2px 4px green;
-            box-shadow: 0 0 2px 4px green;
+    -webkit-box-shadow: 0 0 2px 4px #8C0;
+       -moz-box-shadow: 0 0 2px 4px #8C0;
+            box-shadow: 0 0 2px 4px #8C0;
 	    /*border: 2px solid green;*/
     cursor:pointer;
 }
 
-.piece.selected {
+div.piece.selected {
     -webkit-box-shadow: 0 0 2px 4px green;
-       -moz-box-shadow: 0 0 2px 4px green;
+       -moz-box-shadow: 0 0 2px 4px bluegreen;
             box-shadow: 0 0 2px 4px green;
 }
 
@@ -124,7 +116,8 @@ div.startbar {
     max-width: 400px;
 }
 
-#newgame, #startednew {
+/*#newgame, #startednew {*/
+.blueplayer {
     background-color:#00C;
     color: #fad087;
     font-family: papyrus;
@@ -132,7 +125,8 @@ div.startbar {
     float:left;  
     position:relative;
 }
-#join, #joined {
+/*#join, #joined {*/
+.redplayer {
     background-color:#C00;
     color: #fad087;
     font-family: papyrus;
@@ -141,9 +135,6 @@ div.startbar {
     position:relative;
 }
 
-#joined, div.started {
-    width: 100%;
-}
 
 div.start {
     width:50%;
@@ -153,6 +144,7 @@ div.start {
 }
 
 div.started{
+    width: 100%;
     display: none;
     text-indent: 10px;
     padding-top: 10px;

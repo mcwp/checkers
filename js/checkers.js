@@ -66,7 +66,7 @@ function makeMove(messageData) {
     if (readyToPlay) {
         pieceToMove = document.getElementById(messageData.pieceId);
         $pieceToMove =$(pieceToMove);
-        console.log('pieceToMove ' + $pieceToMove);
+        // console.log('pieceToMove ' + $pieceToMove);
         var top = messageData.newTop;
         var left = messageData.newLeft;
         // if (redplayer) {
@@ -93,9 +93,9 @@ function movePieceTo($piece,newTop,newLeft) {
         newMessageData.pieceId = $piece[0].id;
         newMessageData.newTop = newTop;
         newMessageData.newLeft = newLeft;
-        console.log("sending ...");
-    //	console.log($piece);
-        console.log(newMessageData);
+        // console.log("sending ...");
+        // console.log($piece);
+        // console.log(newMessageData);
         ccps.sendMessagePlay(newMessageData);
     }
 }
@@ -129,6 +129,7 @@ function setUpBoard() {
         var $square = $(square);
         if (squareDark(index)) {
             $square.addClass('dark');
+            console.log("set square dark", index);
         } else {
             $square.addClass('light');
         }
@@ -177,10 +178,10 @@ function getPixels(x,y,flip) {
     //ok... so takes an x,y position, returns
     //pixels from the left, right
     if (flip) {
-        console.log("x, y are ", x, y);
+        // console.log("x, y are ", x, y);
         var xNew = 7-x;
         var yNew = 7-y;
-        console.log("flipping: new x = ", xNew, " new y = ", yNew);
+        // console.log("flipping: new x = ", xNew, " new y = ", yNew);
         x = xNew;
         y = yNew;
     }
@@ -385,7 +386,7 @@ $('document').ready(function() {
                 var x = squareIndex % 8;
                 var y = Math.floor(squareIndex / 8);
                 var pixels = getPixels(x,y,false);
-                console.log("index " + squareIndex + " x " + x + " y " + y);
+                // console.log("index " + squareIndex + " x " + x + " y " + y);
                 
                 //actually do the moving
                 movePieceTo($selectedPiece,pixels.top,pixels.left);
