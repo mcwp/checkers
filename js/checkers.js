@@ -1,34 +1,21 @@
 /*
 
-> $('div div div:first')
-[
-<div class="square light"></div>​
-]
-> $('div div div:nth-child(3)')
-[
-<div class=​"square light"></div>
-, 
-<div class="piece red" style=​"top:0px; left:​ 144px;"></div>
-]
-> $('div.square:nth-child(3)')
-[
-<div class=​"square light"></div>
-]
-> $('div.piece:nth-child(3)')
-[
-<div class="piece red" style="top: 0px;​ left: 144px;"></div>
-]
-
-    startConnection : function (url, newTopic, onStartCallback, messageProps, gotMessagePlay) {
 */
 
 /*
 **********************************
-clean up that messy stuff up above, maybe move it to 
-codebits
-
-Then isolate the checkers game from the hooks added
+isolate the checkers game from the hooks added
 to make use of ws.js. 
+
+make pieces draggable and then modify event handling so
+players may drag to play instead of clicking.  Add a
+nearest-dark-square function
+
+exercise: switch to proper checker board (play on darks,
+and what is the bottom right square supposed to be?)
+
+Add crown for kings, and make it automatic if you hit
+the far row.  Fin.
 
 */
 
@@ -259,9 +246,9 @@ function setUpReds() {
         //turning the x,y coordingate into a pixel position
         var pixelPosition = getPixels(x,y,redplayer);
         
-        //YOUR CODE
         //actually moving the piece to its initial position
         movePieceTo($(piece),pixelPosition.top,pixelPosition.left);
+        // $(piece).draggable();
     });
 }
 
@@ -277,9 +264,9 @@ function setUpBlues() {
         //turning the x,y coordinate into a pixel position
         var pixelPosition = getPixels(x,y,redplayer);
         
-        //YOUR CODE
         //moving the piece to its initial position
         movePieceTo($(piece),pixelPosition.top,pixelPosition.left);
+        // $(piece).draggable();
     });
 }
 
@@ -295,7 +282,6 @@ $('document').ready(function() {
         $('div#board').append($('<div/>').addClass('square'));
     }
     
-    //YOUR CODE
     //set up the board with the correct classes
     //for the light and dark squares
     setUpBoard();
@@ -311,7 +297,6 @@ $('document').ready(function() {
         $('div#pieces').append($(newp).addClass('piece'));
     }
     
-    //YOUR CODE
     //sets up the classes for the different types of piece
     setUpPieces();
     // setUpReds();
@@ -358,7 +343,6 @@ $('document').ready(function() {
         //turn `this` into a jQuery object
         var $this = $(this);
         
-        //YOUR CODE
         //toggleing the 'selected' class of this piece
         //and possible deselecting other pieces
         toggleSelect($this);
